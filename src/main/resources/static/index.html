@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compilador con Java</title>
+    <link rel="icon" href="../Images/java_original_logo_icon_146458.ico">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="normalize.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Afacad+Flux:wght@100..1000&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="contenido-pagina">
+
+        <nav class="nav-lateral">
+
+            <div class="contenedor-boton">
+                
+                <button class="btn-nav" id="btn-editor"> <img src="Images/8665237_code_development_icon.png" alt="Editor Texto"> Editor de código</button>
+            </div>
+
+            <div class="contenedor-boton">
+                <button class="btn-nav" id="btn-token"><img src="Images/9055110_bxs_coin_icon.png" alt="Token">Output</button>
+            </div>
+        </nav>
+
+        <div class="contenido-actual">
+
+            <div class="editor-texto">
+
+                <div class="contenedor-textarea">
+                    <textarea name="editor" id="editor-texto" placeholder="Código..."></textarea>
+                </div>
+
+                <div class="botones-editor">
+                    <button class="btn-editor btn-compilar">Compilar Código</button>
+                    <button class="btn-editor btn-txt">Subir Archivo txt</button>
+                    <input type="file" id="file-input" accept=".txt">
+                </div>
+            </div>
+
+            <div class="output">
+                 
+                <div class="botones-output">
+                    <button class="btn-output btn-tokens">Tokens</button>
+                    <button class="btn-output btn-tabla">Tabla de Símbolos</button>
+                    <button class="btn-output btn-errores">Errores</button>
+                </div>
+
+                <div class="resultado-text">
+                    <textarea id="output" placeholder="No se ha analizado ningún código..." readonly></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js" defer></script>
+    <script src="abrirTxt.js" defer></script>
+    <script src="mostrarPantalla.js" defer></script>
+</body>
+</html>

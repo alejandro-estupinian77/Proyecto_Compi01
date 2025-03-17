@@ -1,0 +1,138 @@
+html img{
+    width: 40px;
+    height: 40px;
+    filter: invert(100%);
+}
+
+html *{
+    font-family: "Lato", sans-serif;
+}
+
+.contenido-pagina{
+    height: 100vh;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+}
+
+button{
+    cursor: pointer;
+}
+
+/*Navegación Lateral*/
+
+.contenido-pagina .nav-lateral{
+    background-color: #000;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 30px 0 0 0;
+}
+
+.contenido-pagina .nav-lateral .contenedor-boton{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-items: center;
+    gap: 15px;
+}
+
+.contenido-pagina .nav-lateral .contenedor-boton .btn-nav{
+    width: 100%;
+    cursor: pointer;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 20px;
+    color: #F4F4F4;
+    background-color: #000;
+    padding: 10px;
+    transition: ease-in;
+}
+
+.contenido-pagina .nav-lateral .contenedor-boton .btn-nav:hover{
+    background-color: #1E90FF;
+}
+
+
+/*Editor Texto*/
+
+.contenido-actual .editor-texto textarea{
+    width: 100%;
+    height: 100%;
+    resize: none;
+}
+
+.contenido-actual .editor-texto{
+    height: 90%;
+    display: grid;
+    grid-template-rows: 4fr 1fr;
+    gap: 30px;
+    padding: 20px;
+}
+
+.contenido-actual .editor-texto .botones-editor{
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    gap: 5px;
+}
+
+.contenido-actual .editor-texto .botones-editor button{
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #000;
+    color: #F4F4F4;
+}
+
+.contenido-actual .editor-texto .botones-editor button:hover{
+    background-color: #1E90FF;
+}
+
+.contenido-actual .editor-texto input{
+    display: none;
+}
+
+/*Output*/
+
+.contenido-actual .output{
+    height: 90%;
+    display: grid;
+    grid-template-rows: 1fr 9fr;
+    padding: 20px;
+    display:none;
+    
+}
+
+.contenido-actual .output .resultado-text textarea{
+    width: 100%;
+    height: 100%;
+    resize: none;
+}
+
+.contenido-actual .output .botones-output{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.contenido-actual .output .botones-output .btn-output{
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    background-color: #000;
+    color:#F4F4F4;
+}
+
+.contenido-actual .output .botones-output button:hover{
+    background-color: #1E90FF;
+}
+
+
+
+
+
+
+
