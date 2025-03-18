@@ -4,12 +4,15 @@ import lombok.Data;
 
 @Data
 public class Token {
-    String tipo;
-    String valor;
-    int linea;
-    int columna;
+    private int indice; // Nuevo campo para el índice
+    private String tipo;
+    private String valor;
+    private int linea;
+    private int columna;
 
-    public Token(String tipo, String valor, int linea, int columna) {
+    // Constructor modificado para incluir el índice
+    public Token(int indice, String tipo, String valor, int linea, int columna) {
+        this.indice = indice;
         this.tipo = tipo;
         this.valor = valor;
         this.linea = linea;

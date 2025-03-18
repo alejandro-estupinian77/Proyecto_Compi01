@@ -35,7 +35,14 @@ public class AnalizadorService {
     // Variable para rastrear si estamos dentro de un comentario de bloque
     private boolean dentroDeComentarioBloque = false;
 
+    // Variable para rastrear el último tipo declarado
+    private String ultimoTipo = null;
+
+    // Contador para enumerar los tokens
+    private int contadorTokens = 1;
+
     public void analizar(String codigo) {
+        resetearAnalizador();
         String[] lineas = codigo.trim().split("\\n");
         for (String linea : lineas) {
             procesarLinea(linea);
@@ -44,10 +51,20 @@ public class AnalizadorService {
         }
     }
 
+    private void resetearAnalizador() {
+        tokens.clear();
+        tablaSimbolos.clear();
+        errores.clear();
+        lineaActual = 1;
+        columnaActual = 1;
+        ultimoTipo = null;
+        contadorTokens = 1; // Reiniciar el contador de tokens
+    }
+
     private void procesarLinea(String linea) {
         String texto = linea.trim();
         while (!texto.isEmpty()) {
-    
+
             // Si estamos dentro de un comentario de bloque, buscar el cierre */
             if (dentroDeComentarioBloque) {
                 Matcher matcherComentarioFinalBloque = patronFinalComentarioBloque.matcher(texto);
@@ -65,7 +82,7 @@ public class AnalizadorService {
                     break;
                 }
             }
-    
+
             // Capturar comentarios de una sola línea
             Matcher matcherComentarioLinea = patronComentarioLinea.matcher(texto);
             if (matcherComentarioLinea.lookingAt()) {
@@ -73,7 +90,7 @@ public class AnalizadorService {
                 agregarToken("COMENTARIO", comentario, lineaActual, columnaActual);
                 break; // Ignorar el resto de la línea
             }
-    
+
             // Detectar inicio de comentario de bloque
             Matcher matcherComentarioBloque = patronInicioComentarioBloque.matcher(texto);
             if (matcherComentarioBloque.lookingAt()) {
@@ -85,10 +102,10 @@ public class AnalizadorService {
                 columnaActual += matcherComentarioBloque.end();
                 continue;
             }
-    
-            // Procesar tokens (resto del código sigue igual)
+
+            // Procesar tokens
             boolean encontrado = false;
-    
+
             // Cadenas
             Matcher matcherCadena = patronCadena.matcher(texto);
             if (matcherCadena.lookingAt()) {
@@ -98,7 +115,7 @@ public class AnalizadorService {
                 encontrado = true;
                 continue;
             }
-    
+
             // Caracteres
             Matcher matcherCaracter = patronCaracter.matcher(texto);
             if (matcherCaracter.lookingAt()) {
@@ -108,7 +125,7 @@ public class AnalizadorService {
                 encontrado = true;
                 continue;
             }
-    
+
             // Números reales
             Matcher matcherReal = patronNumeroReal.matcher(texto);
             if (matcherReal.lookingAt()) {
@@ -118,7 +135,7 @@ public class AnalizadorService {
                 encontrado = true;
                 continue;
             }
-    
+
             // Números enteros
             Matcher matcherEntero = patronNumeroEntero.matcher(texto);
             if (matcherEntero.lookingAt()) {
@@ -128,7 +145,7 @@ public class AnalizadorService {
                 encontrado = true;
                 continue;
             }
-    
+
             // Operadores y signos
             Matcher matcherOperadores = patronOperadores.matcher(texto);
             if (matcherOperadores.lookingAt()) {
@@ -139,7 +156,7 @@ public class AnalizadorService {
                 encontrado = true;
                 continue;
             }
-    
+
             Matcher matcherSignos = patronSignos.matcher(texto);
             if (matcherSignos.lookingAt()) {
                 String signo = matcherSignos.group();
@@ -149,23 +166,31 @@ public class AnalizadorService {
                 encontrado = true;
                 continue;
             }
-    
+
             // Identificadores y palabras reservadas
             Matcher matcherIdentificador = patronIdentificador.matcher(texto);
             if (matcherIdentificador.lookingAt()) {
                 String identificador = matcherIdentificador.group().toLowerCase();
                 if (esPalabraReservada(identificador)) {
+                    // Si es una palabra reservada de tipo (entero, real, etc.)
+                    String tipo = obtenerTipoVariable(identificador);
+                    if (tipo != null) {
+                        ultimoTipo = tipo; // Almacena el tipo para el próximo identificador
+                    }
                     agregarToken("PALABRA_RESERVADA", identificador, lineaActual, columnaActual);
                 } else {
+                    // Usa el último tipo almacenado, o "VARIABLE" si no hay
+                    String tipoSimbolo = (ultimoTipo != null) ? ultimoTipo : "VARIABLE";
                     agregarToken("IDENTIFICADOR", identificador, lineaActual, columnaActual);
-                    agregarSimbolo(identificador, "VARIABLE", lineaActual, columnaActual);
+                    agregarSimbolo(identificador, tipoSimbolo, lineaActual, columnaActual);
+                    ultimoTipo = null; // Reinicia después de usarlo
                 }
                 texto = texto.substring(identificador.length()).trim();
                 columnaActual += identificador.length();
                 encontrado = true;
                 continue;
             }
-    
+
             // Si no se encontró ningún token válido, registrar error
             if (!encontrado) {
                 String caracterInvalido = texto.substring(0, 1);
@@ -190,16 +215,45 @@ public class AnalizadorService {
         return false;
     }
 
+    private String obtenerTipoVariable(String palabra) {
+        return switch (palabra.toLowerCase()) {
+            case "entero" -> "ENTERO";
+            case "real" -> "REAL";
+            case "cadena" -> "CADENA";
+            case "booleano" -> "BOOLEANO";
+            default -> null;
+        };
+    }
+
     private void agregarToken(String tipo, String valor, int linea, int columna) {
-        tokens.add(new Token(tipo, valor, linea, columna));
+        // Usamos contadorTokens como índice y luego lo incrementamos
+        tokens.add(new Token(contadorTokens, tipo, valor, linea, columna));
+        contadorTokens++; // Incrementamos después de agregar
     }
 
     private void agregarSimbolo(String nombre, String tipo, int linea, int columna) {
-        tablaSimbolos.add(new Simbolo(nombre, tipo, linea, columna));
+        // Obtenemos el índice del último token agregado (contadorTokens - 1)
+        int indiceToken = contadorTokens - 1;
+        String indiceFormateado = String.format("%02d", indiceToken);
+        
+        tablaSimbolos.add(new Simbolo(
+            indiceFormateado,
+            nombre,
+            tipo,
+            linea,
+            columna
+        ));
     }
 
-    public ResultadoAnalisis getAnalisis(String codigo){
+    public ResultadoAnalisis getAnalisis(String codigo) {
         analizar(codigo);
         return new ResultadoAnalisis(tokens, errores, tablaSimbolos);
+    }
+
+    public void imprimirTablaSimbolos() {
+        System.out.println("==Tabla de Simbolos==");
+        for (Simbolo simbolo : tablaSimbolos) {
+            System.out.println(simbolo.toString());
+        }
     }
 }

@@ -4,20 +4,25 @@ import lombok.Data;
 
 @Data
 public class Simbolo {
-        String nombre;
-        String tipo;
-        int linea;
-        int columna;
+    private String indice;
+    private String nombre;
+    private String tipo;
+    private int linea;
+    private int columna;
 
-        public Simbolo(String nombre, String tipo, int linea, int columna) {
-            this.nombre = nombre;
-            this.tipo = tipo;
-            this.linea = linea;
-            this.columna = columna;
-        }
+    // Constructor modificado
+    public Simbolo(String indice, String nombre, String tipo, int linea, int columna) {
+        this.indice = indice;
+        this.nombre = nombre;
+        this.tipo = tipo;
+        this.linea = linea;
+        this.columna = columna;
+    }
 
-        @Override
-        public String toString() {
-            return String.format("%s - %s (Línea %d)", nombre, tipo, linea);
-        }
+    @Override
+    public String toString() {
+        // Formato: "01 - contador - IDENTIFICADOR - ENTERO - 2"
+        return String.format("%s - %s - IDENTIFICADOR - %s - %d", 
+            indice, nombre, tipo, columna);
+    }
 }
