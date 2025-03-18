@@ -16,7 +16,6 @@ public class AnalizadorService {
     private List<Token> tokens = new ArrayList<>();
     private List<Simbolo> tablaSimbolos = new ArrayList<>();
     private List<Error> errores = new ArrayList<>();
-    private List<String> buffer = new ArrayList<>();
     private String codigoFuente;
     private int lineaActual = 1;
     private int columnaActual = 1;
@@ -33,46 +32,63 @@ public class AnalizadorService {
     private final Pattern patronOperadores = Pattern.compile("[+\\-*/^#=<>!&|]|>=|<=|==|!=|&&|\\|\\|");
     private final Pattern patronSignos = Pattern.compile("[();{},]");
 
+    // Variable para rastrear si estamos dentro de un comentario de bloque
+    private boolean dentroDeComentarioBloque = false;
+
     public void analizar(String codigo) {
         String[] lineas = codigo.trim().split("\\n");
         for (String linea : lineas) {
-            
-            //Procesar si es inicio de un comentario bloque
-            if(linea.trim().equals("/*") || linea.trim().equals( "*/")){
-                buffer.add(linea.trim());
-            }
             procesarLinea(linea);
             lineaActual++;
-            columnaActual = 1;
+            columnaActual = 1; // Reiniciar la columna al inicio de cada línea
         }
     }
 
     private void procesarLinea(String linea) {
         String texto = linea.trim();
         while (!texto.isEmpty()) {
-
-            // Ignorar comentarios
+    
+            // Si estamos dentro de un comentario de bloque, buscar el cierre */
+            if (dentroDeComentarioBloque) {
+                Matcher matcherComentarioFinalBloque = patronFinalComentarioBloque.matcher(texto);
+                if (matcherComentarioFinalBloque.find()) {
+                    // Capturar todo el contenido del comentario de bloque, incluyendo */
+                    String comentario = texto.substring(0, matcherComentarioFinalBloque.end());
+                    agregarToken("COMENTARIO", comentario, lineaActual, columnaActual);
+                    texto = texto.substring(matcherComentarioFinalBloque.end()).trim();
+                    dentroDeComentarioBloque = false;
+                    columnaActual += matcherComentarioFinalBloque.end();
+                    continue;
+                } else {
+                    // Si no encontramos el cierre, capturar toda la línea como parte del comentario
+                    agregarToken("COMENTARIO", texto, lineaActual, columnaActual);
+                    break;
+                }
+            }
+    
+            // Capturar comentarios de una sola línea
             Matcher matcherComentarioLinea = patronComentarioLinea.matcher(texto);
             if (matcherComentarioLinea.lookingAt()) {
-                break;
+                String comentario = matcherComentarioLinea.group();
+                agregarToken("COMENTARIO", comentario, lineaActual, columnaActual);
+                break; // Ignorar el resto de la línea
             }
-
+    
+            // Detectar inicio de comentario de bloque
             Matcher matcherComentarioBloque = patronInicioComentarioBloque.matcher(texto);
             if (matcherComentarioBloque.lookingAt()) {
+                dentroDeComentarioBloque = true;
+                // Capturar el inicio del comentario de bloque (/*)
+                String comentario = matcherComentarioBloque.group();
+                agregarToken("COMENTARIO", comentario, lineaActual, columnaActual);
                 texto = texto.substring(matcherComentarioBloque.end()).trim();
+                columnaActual += matcherComentarioBloque.end();
                 continue;
             }
-
-            Matcher matcherCometarioFinalBloque = patronFinalComentarioBloque.matcher(texto);
-            if(matcherCometarioFinalBloque.lookingAt()){
-                texto = texto.substring(matcherCometarioFinalBloque.end()).trim();
-                continue;
-            }
-            
-
-            // Procesar tokens
+    
+            // Procesar tokens (resto del código sigue igual)
             boolean encontrado = false;
-
+    
             // Cadenas
             Matcher matcherCadena = patronCadena.matcher(texto);
             if (matcherCadena.lookingAt()) {
@@ -82,7 +98,7 @@ public class AnalizadorService {
                 encontrado = true;
                 continue;
             }
-
+    
             // Caracteres
             Matcher matcherCaracter = patronCaracter.matcher(texto);
             if (matcherCaracter.lookingAt()) {
@@ -92,7 +108,7 @@ public class AnalizadorService {
                 encontrado = true;
                 continue;
             }
-
+    
             // Números reales
             Matcher matcherReal = patronNumeroReal.matcher(texto);
             if (matcherReal.lookingAt()) {
@@ -102,7 +118,7 @@ public class AnalizadorService {
                 encontrado = true;
                 continue;
             }
-
+    
             // Números enteros
             Matcher matcherEntero = patronNumeroEntero.matcher(texto);
             if (matcherEntero.lookingAt()) {
@@ -112,7 +128,7 @@ public class AnalizadorService {
                 encontrado = true;
                 continue;
             }
-
+    
             // Operadores y signos
             Matcher matcherOperadores = patronOperadores.matcher(texto);
             if (matcherOperadores.lookingAt()) {
@@ -123,7 +139,7 @@ public class AnalizadorService {
                 encontrado = true;
                 continue;
             }
-
+    
             Matcher matcherSignos = patronSignos.matcher(texto);
             if (matcherSignos.lookingAt()) {
                 String signo = matcherSignos.group();
@@ -133,21 +149,10 @@ public class AnalizadorService {
                 encontrado = true;
                 continue;
             }
-
+    
             // Identificadores y palabras reservadas
             Matcher matcherIdentificador = patronIdentificador.matcher(texto);
             if (matcherIdentificador.lookingAt()) {
-
-                if(buffer.contains("/*")){
-
-                    if(!buffer.contains("*/")){
-                        texto = "";
-                        continue;
-                    }else{
-                    buffer.clear();
-                    }
-                }
-
                 String identificador = matcherIdentificador.group().toLowerCase();
                 if (esPalabraReservada(identificador)) {
                     agregarToken("PALABRA_RESERVADA", identificador, lineaActual, columnaActual);
@@ -155,13 +160,12 @@ public class AnalizadorService {
                     agregarToken("IDENTIFICADOR", identificador, lineaActual, columnaActual);
                     agregarSimbolo(identificador, "VARIABLE", lineaActual, columnaActual);
                 }
-                    texto = texto.substring(identificador.length()).trim();
-                    columnaActual += identificador.length();
-                    encontrado = true;
-                    continue;
-                }
-            
-
+                texto = texto.substring(identificador.length()).trim();
+                columnaActual += identificador.length();
+                encontrado = true;
+                continue;
+            }
+    
             // Si no se encontró ningún token válido, registrar error
             if (!encontrado) {
                 String caracterInvalido = texto.substring(0, 1);
