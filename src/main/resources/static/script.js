@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function mostrarErrores(errores) {
-        const erroresTexto = errores.map(error => `${error.mensaje}`).join("\n");
+        const erroresTexto = errores.map(error => `Error Léxico en línea ${error.linea} columna ${error.columna}: ${error.mensaje}`).join("\n");
         output.value = `==Errores==\n${erroresTexto}`;
     }
 });
