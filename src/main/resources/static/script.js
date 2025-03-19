@@ -1,5 +1,4 @@
-document.addEventListener('DOMContentLoaded', ()=>{
-
+document.addEventListener('DOMContentLoaded', () => {
     const btnCompilar = document.querySelector(".btn-compilar");
     const btnMostrarTokens = document.querySelector(".btn-tokens");
     const btnMostrarTabla = document.querySelector(".btn-tabla");
@@ -8,7 +7,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
     let resultadoAnalisis = null;
 
-    btnCompilar.addEventListener('click', async()=>{
+    btnCompilar.addEventListener('click', async () => {
         const codigo = document.getElementById("editor-texto").value;
 
         try {
@@ -25,51 +24,50 @@ document.addEventListener('DOMContentLoaded', ()=>{
             }
 
             resultadoAnalisis = await respuesta.json();
-            
-            if(resultadoAnalisis){
+
+            if (resultadoAnalisis) {
                 alert("Se ha compilado el código exitosamente");
-            }else{
+            } else {
                 alert("No se ha logrado compilar el código");
             }
         } catch (error) {
             console.error("Error al analizar el código:", error);
             alert("Error al analizar el código. Revisa la consola para más detalles.");
         }
-        
     });
 
-    btnMostrarTokens.addEventListener('click', ()=>{
-        if(resultadoAnalisis){
+    btnMostrarTokens.addEventListener('click', () => {
+        if (resultadoAnalisis) {
             mostrarTokens(resultadoAnalisis.tokens);
         }
     });
 
-    function mostrarTokens(tokens){
-        const tokensTexto = tokens.map(token => `<${token.tipo}> ${token.valor}`).join("\n");
+    function mostrarTokens(tokens) {
+        const tokensTexto = tokens.map(token => `<${token.tipo}, ${token.indice}> ${token.valor}`).join("\n");
         output.value = `==Tokens==\n${tokensTexto}`;
     }
 
-    btnMostrarTabla.addEventListener('click', ()=>{
-        if(resultadoAnalisis){
+    btnMostrarTabla.addEventListener('click', () => {
+        if (resultadoAnalisis) {
             mostrarSimbolos(resultadoAnalisis.simbolos);
         }
-    })
+    });
 
-    function mostrarSimbolos(simbolos){
-        const simbolosTexto = simbolos.map(simbolo => `${simbolo.nombre}-${simbolo.tipo}-${simbolo.linea}-${simbolo.columna}`).join("\n");
+    function mostrarSimbolos(simbolos) {
+        const simbolosTexto = simbolos.map(simbolo => 
+            `${simbolo.indice} - ${simbolo.nombre} - Identificador - ${simbolo.tipo} - Linea: ${simbolo.linea} - Columna: ${simbolo.columna}`
+        ).join("\n");
         output.value = `==Tabla de Simbolos==\n${simbolosTexto}`;
     }
 
-    btnMostrarErrores.addEventListener('click', () =>{
-        console.log(resultadoAnalisis);
-        if(resultadoAnalisis){
+    btnMostrarErrores.addEventListener('click', () => {
+        if (resultadoAnalisis) {
             mostrarErrores(resultadoAnalisis.errores);
         }
-    })
+    });
 
-    function mostrarErrores(errores){
-        const erroresTexto = errores.map(error=>`${error.mensaje}`).join("\n");
+    function mostrarErrores(errores) {
+        const erroresTexto = errores.map(error => `${error.mensaje}`).join("\n");
         output.value = `==Errores==\n${erroresTexto}`;
-
     }
 });
