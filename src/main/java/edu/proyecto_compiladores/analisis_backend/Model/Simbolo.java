@@ -10,7 +10,6 @@ public class Simbolo {
     private int linea;
     private int columna;
 
-    // Constructor modificado
     public Simbolo(String indice, String nombre, String tipo, int linea, int columna) {
         this.indice = indice;
         this.nombre = nombre;
@@ -21,8 +20,9 @@ public class Simbolo {
 
     @Override
     public String toString() {
-        // Formato: "01 - contador - IDENTIFICADOR - ENTERO - 2"
-        return String.format("%s - %s - IDENTIFICADOR - %s - %d", 
-            indice, nombre, tipo, columna);
+        return String.format(
+            "%s - %s - Identificador - %s - Linea: %d - Columna: %d",
+            indice, nombre, tipo, linea, columna
+        );
     }
 }

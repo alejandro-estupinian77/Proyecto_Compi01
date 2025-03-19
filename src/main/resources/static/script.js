@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     })
 
     function mostrarSimbolos(simbolos){
-        const simbolosTexto = simbolos.map(simbolo => `${simbolo.nombre}-${simbolo.tipo}-${simbolo.linea}-${simbolo.col}`).join("\n");
+        const simbolosTexto = simbolos.map(simbolo => `${simbolo.nombre}-${simbolo.tipo}-${simbolo.linea}-${simbolo.columna}`).join("\n");
         output.value = `==Tabla de Simbolos==\n${simbolosTexto}`;
     }
 

@@ -232,28 +232,26 @@ public class AnalizadorService {
     }
 
     private void agregarSimbolo(String nombre, String tipo, int linea, int columna) {
-        // Obtenemos el índice del último token agregado (contadorTokens - 1)
+        // Obtener el índice del token actual
         int indiceToken = contadorTokens - 1;
         String indiceFormateado = String.format("%02d", indiceToken);
-        
-        tablaSimbolos.add(new Simbolo(
-            indiceFormateado,
-            nombre,
-            tipo,
-            linea,
-            columna
-        ));
+    
+        // Crear el símbolo con el formato deseado
+        Simbolo simbolo = new Simbolo(
+            indiceFormateado, // Índice formateado
+            nombre,           // Nombre del identificador
+            tipo,             // Tipo del identificador
+            linea,            // Línea en el código fuente
+            columna           // Columna en el código fuente
+        );
+    
+        // Agregar el símbolo a la tabla
+        tablaSimbolos.add(simbolo);
     }
 
     public ResultadoAnalisis getAnalisis(String codigo) {
-        analizar(codigo);
+        analizar(codigo); // Analiza el código y genera tokens, símbolos y errores
         return new ResultadoAnalisis(tokens, errores, tablaSimbolos);
     }
 
-    public void imprimirTablaSimbolos() {
-        System.out.println("==Tabla de Simbolos==");
-        for (Simbolo simbolo : tablaSimbolos) {
-            System.out.println(simbolo.toString());
-        }
-    }
 }
