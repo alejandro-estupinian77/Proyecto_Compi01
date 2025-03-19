@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const simbolosTexto = simbolos.map(simbolo => 
             `${simbolo.indice} || ${simbolo.nombre} || Identificador || ${simbolo.tipo} || Linea: ${simbolo.linea} || Columna: ${simbolo.columna}`
         ).join("\n");
-        output.value =`==Tabla de Simbolos==\n\nIndice || Identificador || Tipo01 || Tipo02 || Linea || Columna\n\n${simbolosTexto} ⁠;`;
+        output.value =`==Tabla de Simbolos==\n\nIndice || Identificador || Tipo01 || Tipo02 || Linea || Columna\n\n${simbolosTexto} ⁠`;
     }
 
     btnMostrarErrores.addEventListener('click', () => {
